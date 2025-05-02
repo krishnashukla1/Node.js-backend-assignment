@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  title: Express.js Backend Assignment
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+                role: { type: string, enum: ['ADMIN', 'EDITOR', 'VIEWER'] }
+      responses:
+        '200': { description: User registered }
+  /auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: JWT token }
+  /users:
+    get:
+      summary: Get all users (Admin only)
+      responses:
+        '200': { description: List of users }
+  /users/{id}/role:
+    patch:
+      summary: Update user role (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role: { type: string, enum: ['ADMIN', 'EDITOR', 'VIEWER'] }
+      responses:
+        '200': { description: Updated user }
+  /users/{id}/active:
+    patch:
+      summary: Toggle user active status (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_active: { type: boolean }
+      responses:
+        '200': { description: Updated user }
+  /documents:
+    post:
+      summary: Create document (Editor, Admin)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                description: { type: string }
+                file: { type: string, format: binary }
+      responses:
+        '200': { description: Created document }
+    get:
+      summary: Get all documents
+      responses:
+        '200': { description: List of documents }
+  /documents/{id}:
+    patch:
+      summary: Update document (Editor, Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                description: { type: string }
+      responses:
+        '200': { description: Updated document }
+    delete:
+      summary: Delete document (Editor, Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: Document deleted }
+  /ingestion:
+    post:
+      summary: Trigger ingestion (Editor, Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                document_id: { type: integer }
+      responses:
+        '200': { description: Ingestion job created }
+    get:
+      summary: List ingestion jobs (Admin)
+      responses:
+        '200': { description: List of ingestion jobs }
